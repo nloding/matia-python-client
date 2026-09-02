@@ -3,7 +3,7 @@
 ## Install
 
 ```bash
-poetry add matia-client
+poetry add matia-python-client
 ```
 
 ## Create a client

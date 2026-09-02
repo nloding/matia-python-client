@@ -2,13 +2,13 @@
 
 ## Supported Versions
 
-`matia-client` is currently in pre-1.0 alpha. Only the latest released
+`matia-python-client` is currently in pre-1.0 alpha. Only the latest released
 version is supported with security fixes.
 
 | Version    | Supported |
 | ---------- | --------- |
-| 1.0.0a1    | Yes       |
-| < 1.0.0a1  | No        |
+| 1.0.0a2    | Yes       |
+| < 1.0.0a2  | No        |
 
 ## Reporting a Vulnerability
 

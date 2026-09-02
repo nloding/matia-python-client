@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for considering a contribution to `matia-client`.
+Thanks for considering a contribution to `matia-python-client`.
 
 ## Setup
 

@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.0a2
+
+- Renamed the distribution from `matia-client` to `matia-python-client`.
+- Fixed Python 3.9 compatibility by adding `eval-type-backport` as a conditional
+  dependency (required for `pydantic` to resolve `X | None` style annotations
+  on 3.9).
+- Bumped CI workflow actions (`checkout`, `setup-python`, `upload-artifact`,
+  `download-artifact`) to versions that run natively on Node.js 24.
+
 ## 1.0.0a1
 
 First alpha release. The API surface may still change before `1.0.0`.

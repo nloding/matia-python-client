@@ -1,6 +1,6 @@
 [tool.poetry]
-name = "matia-client"
-version = "1.0.0a1"
+name = "matia-python-client"
+version = "1.0.0a2"
 description = "An idiomatic, fluent Python client for the Matia API"
 authors = ["Matia"]
 license = "MIT"

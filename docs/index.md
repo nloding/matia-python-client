@@ -1,4 +1,4 @@
-# matia-client
+# matia-python-client
 
 An idiomatic, fluent Python client library for the [Matia](https://matia.io) API.
 

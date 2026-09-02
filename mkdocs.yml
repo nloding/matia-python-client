@@ -1,6 +1,6 @@
-site_name: matia-client
+site_name: matia-python-client
 site_description: An idiomatic, fluent Python client for the Matia API
-repo_name: matia-client
+repo_name: matia-python-client
 repo_url: https://github.com/nloding/matia-python-client
 
 theme:
