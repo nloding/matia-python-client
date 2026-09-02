@@ -1,0 +1,1839 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "OpenAPI Matia",
+    "description": "Matia API using the OpenAPI specification",
+    "license": {
+      "name": "MIT"
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.matia.io/v1"
+    }
+  ],
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Assets",
+      "description": "Operations for managing data assets"
+    },
+    {
+      "name": "Integrations",
+      "description": "Operations for managing integrations, syncs, and schemas"
+    },
+    {
+      "name": "Tags",
+      "description": "Operations for managing tags and tag relations"
+    },
+    {
+      "name": "Users",
+      "description": "Operations for managing users"
+    },
+    {
+      "name": "Audit Logs",
+      "description": "Operations for viewing audit logs"
+    }
+  ],
+  "paths": {
+    "/assets": {
+      "post": {
+        "tags": ["Assets"],
+        "summary": "Create a new asset",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAssetRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Asset created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateAssetApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/assets/{id}": {
+      "patch": {
+        "tags": ["Assets"],
+        "summary": "Edit an existing asset",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the asset to edit",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAssetRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Asset updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateAssetApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/integrations": {
+      "get": {
+        "tags": ["Integrations"],
+        "summary": "List all integrations",
+        "responses": {
+          "200": {
+            "description": "Successfully listed all integrations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListAllIntegrationsApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Integrations"],
+        "summary": "Create a new integration",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "discriminator": {
+                  "propertyName": "type",
+                  "mapping": {
+                    "postgres": "#/components/schemas/PostgresConnector",
+                    "google_analytics_4": "#/components/schemas/GoogleAnalytics4Connector"
+                  }
+                },
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/PostgresConnector"
+                  },
+                  {
+                    "$ref": "#/components/schemas/GoogleAnalytics4Connector"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Integration created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewIntegration"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/integrations/{id}/run": {
+      "post": {
+        "tags": ["Integrations"],
+        "summary": "Run a sync for a specific integration",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the integration to run",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Integration ran successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncIntegrationApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/integrations/{id}/runs/{runId}": {
+      "get": {
+        "tags": ["Integrations"],
+        "summary": "Get the status of a specific integration run",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The ID of the integration run"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationRunApiResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Integration run not found"
+          }
+        }
+      }
+    },
+    "/integrations/{id}": {
+      "patch": {
+        "tags": ["Integrations"],
+        "summary": "Update integration",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateIntegrationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Integration updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateIntegrationApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Integrations"],
+        "summary": "Delete integration",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The ID of the integration to delete"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operation performed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteIntegrationApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Integrations"],
+        "summary": "Get the details of a specific integration",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The ID of the integration"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetIntegrationDetailsApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/integrations/{id}/schemas": {
+      "get": {
+        "tags": ["Integrations"],
+        "summary": "Get integration schema config",
+        "description": "Returns the integration source schema config for the specified integration",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The ID of the integration"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationSchemaConfigApiResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Integration not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Integrations"],
+        "summary": "Update integration schema config",
+        "description": "Updates the integration source schema config for the specified integration",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The ID of the integration"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IntegrationSchemaConfigApiRequestBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationSchemaConfigApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Integration not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/integrations/{id}/schemas/{schema}/tables/{table}/columns": {
+      "get": {
+        "tags": ["Integrations"],
+        "summary": "Get table columns",
+        "description": "Returns the source table columns for the specified integration and table",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The ID of the integration"
+          },
+          {
+            "in": "path",
+            "name": "schema",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The schema name"
+          },
+          {
+            "in": "path",
+            "name": "table",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The table name"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationTableColumnsApiResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Integration not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "List all users",
+        "responses": {
+          "200": {
+            "description": "Successfully listed all users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListAllUsersApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tags": {
+      "get": {
+        "tags": ["Tags"],
+        "summary": "List all tags",
+        "responses": {
+          "200": {
+            "description": "Successfully listed all tags",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListAllTagsApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Tags"],
+        "summary": "Create a tag",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTagRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateTagApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tags/{id}": {
+      "get": {
+        "tags": ["Tags"],
+        "summary": "Get the details of a specific tag",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "ID of the tag"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetTagDetailsApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Tags"],
+        "summary": "Edit specific tag by ID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The ID of the tag"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditTagRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EditTagApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Tags"],
+        "summary": "Delete a tag by ID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The ID of the tag"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteTagApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tags/{id}/relation": {
+      "post": {
+        "tags": ["Tags"],
+        "summary": "Create a relation between a tag and a resource",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignTagRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssignTagApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Tags"],
+        "summary": "Delete a relation between a tag and a resource",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveTagRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RemoveTagApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/audit-logs": {
+      "get": {
+        "tags": ["Audit Logs"],
+        "summary": "List audit logs",
+        "x-beta": true,
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Max number of audit logs to return.",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of audit logs to skip for pagination.",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "description": "The field to sort the audit logs by.",
+            "schema": {
+              "type": "string",
+              "enum": ["timestamp"],
+              "default": "timestamp"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "description": "The direction of the sort.",
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"],
+              "default": "desc"
+            }
+          },
+          {
+            "name": "startAt",
+            "in": "query",
+            "description": "Filter for audit logs AFTER this timestamp (inclusive).",
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2025-12-27T00:00:00Z"
+            }
+          },
+          {
+            "name": "endAt",
+            "in": "query",
+            "description": "Filter for audit logs BEFORE this timestamp (exclusive).",
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2025-12-27T23:59:59Z"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully listed audit logs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "totalItems": {
+                          "type": "integer",
+                          "description": "Total number of audit logs matching the filters.",
+                          "example": 1250
+                        },
+                        "items": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/AuditLog"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "IntegrationObject": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "paused": { "type": "boolean" },
+          "source": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" },
+              "type": { "type": "string" }
+            }
+          },
+          "destination": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" },
+              "type": { "type": "string" }
+            }
+          },
+          "latestRunId": { "type": "string", "nullable": true }
+        }
+      },
+      "ConnectorBase": {
+        "title": "Connector Base",
+        "type": "object",
+        "required": ["destinationId", "destinationSchema", "replicationFrequency", "enabled"],
+        "properties": {
+          "destinationId": { "type": "string" },
+          "destinationSchema": { "type": "string" },
+          "replicationFrequency": { "type": "string" },
+          "onSchemaUpdate": { "type": "string" },
+          "enabled": { "type": "boolean" }
+        }
+      },
+      "GoogleAnalytics4Connector": {
+        "title": "Google Analytics 4 Connector",
+        "allOf": [
+          { "$ref": "#/components/schemas/ConnectorBase" },
+          {
+            "type": "object",
+            "required": ["sourceConfig", "sourceSettings"],
+            "properties": {
+              "sourceConfig": {
+                "type": "object",
+                "required": ["type", "name", "connection", "connectionType", "owners"],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": ["google_analytics_4"]
+                  },
+                  "name": { "type": "string" },
+                  "connection": {
+                    "type": "object",
+                    "properties": {
+                      "refresh_token": {
+                        "type": "string"
+                      },
+                      "client_id": { "type": "string" },
+                      "client_secret": {
+                        "type": "string"
+                      },
+                      "rollback": { "type": "integer" }
+                    }
+                  },
+                  "connectionType": { "type": "string" },
+                  "owners": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  }
+                }
+              },
+              "sourceSettings": {
+                "type": "object",
+                "properties": {
+                  "account": { "type": "string" },
+                  "properties": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  },
+                  "customReports": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "PostgresConnector": {
+        "title": "Postgres Connector",
+        "allOf": [
+          { "$ref": "#/components/schemas/ConnectorBase" },
+          {
+            "type": "object",
+            "required": ["onSchemaUpdate", "sourceConfig", "sourceSettings"],
+            "properties": {
+              "onSchemaUpdate": { "type": "string" },
+              "sourceConfig": {
+                "type": "object",
+                "required": [
+                  "type",
+                  "name",
+                  "authMethod",
+                  "connection",
+                  "connectionType",
+                  "owners"
+                ],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": ["postgres"]
+                  },
+                  "name": { "type": "string" },
+                  "authMethod": { "type": "string" },
+                  "connection": {
+                    "type": "object",
+                    "properties": {
+                      "username": { "type": "string" },
+                      "password": { "type": "string" },
+                      "hostname": { "type": "string" },
+                      "port": { "type": "integer" },
+                      "database": { "type": "string" },
+                      "slot": { "type": "string" },
+                      "publication": { "type": "string" }
+                    }
+                  },
+                  "connectionType": { "type": "string" },
+                  "owners": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  }
+                }
+              },
+              "sourceSettings": {
+                "type": "object",
+                "properties": {
+                  "max_clients": { "type": "integer" },
+                  "incremental_mode": { "type": "string" }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "CreateAssetApiResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "CreateAssetRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the asset"
+          },
+          "type": {
+            "type": "string",
+            "description": "Type of the asset"
+          },
+          "description": {
+            "type": "string"
+          },
+          "connection": {
+            "type": "object",
+            "description": "Connection details"
+          },
+          "connectionType": {
+            "type": "string",
+            "enum": ["source", "destination"]
+          }
+        }
+      },
+      "UpdateAssetApiResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "UpdateAssetRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the asset"
+          },
+          "description": {
+            "type": "string"
+          },
+          "connection": {
+            "type": "object",
+            "description": "Connection details"
+          }
+        }
+      },
+      "IntegrationRunApiResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "integrationId": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "startTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "endTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "committedRecords": {
+                "type": "integer"
+              },
+              "emittedRecords": {
+                "type": "integer"
+              },
+              "size": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      },
+      "IntegrationSchemaConfigApiResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "schemas": {
+                "type": "object",
+                "properties": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "nameInDestination": {
+                        "type": "string"
+                      },
+                      "enabled": {
+                        "type": "boolean"
+                      },
+                      "tables": {
+                        "type": "object",
+                        "properties": {
+                          "table": {
+                            "type": "object",
+                            "properties": {
+                              "nameInDestination": {
+                                "type": "string"
+                              },
+                              "enabled": {
+                                "type": "boolean"
+                              },
+                              "syncMode": {
+                                "type": "string"
+                              },
+                              "cursorField": {
+                                "type": "string"
+                              },
+                              "columns": {
+                                "type": "object",
+                                "properties": {
+                                  "column": {
+                                    "type": "object",
+                                    "properties": {
+                                      "nameInDestination": {
+                                        "type": "string"
+                                      },
+                                      "enabled": {
+                                        "type": "boolean"
+                                      },
+                                      "hashed": {
+                                        "type": "boolean"
+                                      },
+                                      "isPrimaryKey": {
+                                        "type": "boolean"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "IntegrationSchemaConfigApiRequestBody": {
+        "type": "object",
+        "properties": {
+          "schemas": {
+            "type": "object",
+            "properties": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "tables": {
+                    "type": "object",
+                    "properties": {
+                      "table": {
+                        "type": "object",
+                        "properties": {
+                          "enabled": {
+                            "type": "boolean"
+                          },
+                          "columns": {
+                            "type": "object",
+                            "properties": {
+                              "column": {
+                                "type": "object",
+                                "properties": {
+                                  "enabled": {
+                                    "type": "boolean"
+                                  },
+                                  "hashed": {
+                                    "type": "boolean"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "IntegrationTableColumnsApiResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "columns": {
+                "type": "object",
+                "properties": {
+                  "column": {
+                    "type": "object",
+                    "properties": {
+                      "nameInDestination": {
+                        "type": "string"
+                      },
+                      "enabled": {
+                        "type": "boolean"
+                      },
+                      "hashed": {
+                        "type": "boolean"
+                      },
+                      "isPrimaryKey": {
+                        "type": "boolean"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "SyncIntegrationApiResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "ID of the integration that was ran"
+              }
+            }
+          }
+        }
+      },
+      "UpdateIntegrationApiResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "paused": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "UpdateIntegrationRequest": {
+        "type": "object",
+        "properties": {
+          "paused": {
+            "type": "boolean",
+            "description": "Indicates whether the integration is paused or not"
+          }
+        }
+      },
+      "NewIntegration": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SyncIntegrationApiResponse"
+          },
+          {
+            "required": ["id"],
+            "type": "object",
+            "properties": {
+              "id": {
+                "description": "Identification number of the integration",
+                "type": "integer",
+                "format": "int64"
+              }
+            }
+          }
+        ]
+      },
+      "ListAllUsersApiResponse": {
+        "type": "object",
+        "required": ["code", "data"],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "required": ["items"],
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": ["id", "email", "createdAt"]
+                }
+              }
+            }
+          }
+        }
+      },
+      "ListAllTagsApiResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "required": ["items"],
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "owner": {
+                      "type": "string"
+                    },
+                    "origin": {
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "lastUpdatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": ["id", "email", "createdAt"]
+                }
+              }
+            }
+          }
+        }
+      },
+      "GetTagDetailsApiResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "owner": {
+                "type": "string"
+              },
+              "origin": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "lastUpdatedAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "taggedResources": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "CreateTagRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "owner": {
+            "type": "string",
+            "description": "User ID"
+          }
+        },
+        "required": ["name", "owner"]
+      },
+      "CreateTagApiResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "ID of created tag"
+              }
+            }
+          }
+        }
+      },
+      "EditTagRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "owner": {
+            "type": "string"
+          }
+        }
+      },
+      "EditTagApiResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "owner": {
+                "type": "string"
+              },
+              "origin": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "lastUpdatedAt": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        }
+      },
+      "DeleteTagApiResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "AssignTagRequest": {
+        "type": "object",
+        "properties": {
+          "resourceId": {
+            "type": "string",
+            "description": "The ID of tagged resource"
+          },
+          "resourceType": {
+            "type": "string",
+            "description": "Type of tagged resource: Integration, DataAsset, Monitor"
+          },
+          "taggedBy": {
+            "type": "string",
+            "description": "The ID of the user"
+          }
+        },
+        "required": ["resourceId", "resourceType", "taggedBy"]
+      },
+      "AssignTagApiResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "RemoveTagRequest": {
+        "type": "object",
+        "properties": {
+          "resourceId": {
+            "type": "string",
+            "description": "The ID of tagged resource"
+          },
+          "resourceType": {
+            "type": "string",
+            "description": "Type of tagged resource: Integration, DataAsset, Monitor"
+          }
+        },
+        "required": ["resourceId", "resourceType"]
+      },
+      "RemoveTagApiResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "DeleteIntegrationApiResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "GetIntegrationDetailsApiResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "integration": {
+                "$ref": "#/components/schemas/IntegrationObject"
+              }
+            }
+          }
+        }
+      },
+      "ListAllIntegrationsApiResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/IntegrationObject"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Error": {
+        "required": ["error", "message"],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "AuditLog": {
+        "type": "object",
+        "required": ["id", "timestamp", "event", "actor"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "UTC timestamp of the audit log.",
+            "example": "2025-12-27T16:20:00Z"
+          },
+          "event": {
+            "type": "string",
+            "example": "User logged in"
+          },
+          "actor": {
+            "$ref": "#/components/schemas/Actor"
+          },
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          }
+        }
+      },
+      "Actor": {
+        "type": "object",
+        "required": ["type"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["user", "system"],
+            "example": "user"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "user@email.com"
+          }
+        }
+      },
+      "Context": {
+        "type": "object",
+        "properties": {
+          "ipAddress": {
+            "type": "string",
+            "format": "ipv4",
+            "example": "192.168.1.1"
+          },
+          "userAgent": {
+            "type": "string",
+            "example": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)..."
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
+      }
+    }
+  }
+}
